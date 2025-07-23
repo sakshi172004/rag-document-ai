@@ -1,14 +1,15 @@
 
-pydantic
-python-dotenv
+streamlit
+requests
 langchain
 langchain-community
 langchain-google-genai
 pypdf
 sentence-transformers
-chromadb
+# Use a version of chromadb that doesn't need C++ compiler
+chromadb==0.4.24
+pydantic<2
+# Remove sqlite3
 pytest
 httpx
 python-multipart
-streamlit
-requests
