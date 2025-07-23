@@ -5,6 +5,11 @@ import time
 from datetime import datetime
 import os
 
+# --- YEH HAI NAYA, GUARANTEED FIX ---
+import sys
+# Add the 'app' directory to the Python path
+sys.path.append(os.path.abspath('app'))
+
 # --- IMPORTANT: Import backend logic directly ---
 # We are not using API calls anymore, we are calling Python functions directly.
 from app import db, pipeline
