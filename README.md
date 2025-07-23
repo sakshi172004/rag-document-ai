@@ -1,59 +1,94 @@
-# My RAG App
+# 🧠 IntelliDoc AI: Your Personal Document Chat Assistant
 
-A simple API to upload PDF documents and ask questions about them. Built with FastAPI and powered by Google Gemini.
+IntelliDoc AI is a full-stack, containerized Retrieval-Augmented Generation (RAG) application that allows you to chat with your PDF documents. It features a sophisticated backend built with FastAPI and a beautiful, intuitive frontend powered by Streamlit. The entire system is orchestrated with Docker for seamless local and cloud deployment.
 
-## How it Works
+## 🚀 Live Demo
 
-1.  You upload PDF files.
-2.  The app splits them into smaller pieces (chunks).
-3.  It stores these chunks in a local vector database (ChromaDB).
-4.  When you ask a question, the app finds the most relevant chunks and sends them to Google Gemini along with your question.
-5.  Gemini generates an answer based on the information provided.
+You can try the live, deployed version of this application here:
 
-## How to Run This
+[**➡️ IntelliDoc AI - Live App**](https://rag-document-ai-kohzfpsxs8nnlnthzmbqs4.streamlit.app)
+
+![IntelliDoc AI Screenshot](demo.png)
+
+## ✨ Features
+
+- **Interactive Chat UI:** A clean, modern, and user-friendly interface inspired by leading AI chatbots.
+- **Multi-Document Support:** Upload and process multiple PDF documents at once.
+- **Advanced RAG Pipeline:** Utilizes a powerful sentence-transformer for embeddings and FAISS for efficient vector storage and retrieval.
+- **Powered by Google Gemini:** Leverages the `gemini-1.5-flash` model for fast and accurate answer generation.
+- **Persistent Chat History:** Conversations are saved in the session, with options to start a new chat or delete old ones.
+- **View Document Metadata:** Users can view a list of all documents processed by the system and their upload timestamps.
+- **Fully Containerized:** The entire application (backend + frontend) is managed by Docker Compose for easy, one-command setup.
+
+## 🛠️ Tech Stack
+
+- **Frontend:** Streamlit
+- **Backend:** FastAPI
+- **LLM:** Google Gemini (`gemini-1.5-flash-latest`)
+- **Core Logic:** LangChain
+- **Vector Database:** FAISS (CPU)
+- **Embeddings:** `sentence-transformers` (`all-MiniLM-L6-v2`)
+- **Deployment:** Docker, Streamlit Community Cloud
+
+## ⚙️ Running Locally
 
 ### Prerequisites
-*   You need [Docker](https://www.docker.com/get-started) installed.
-*   You need a Google Gemini API Key.
+
+- [Docker](https://www.docker.com/get-started) and Docker Compose
+- [Git](https://git-scm.com/)
+- A **Google Gemini API Key** from [Google AI Studio](https://aistudio.google.com/app/apikey).
 
 ### Setup Steps
 
-1.  **Clone this project:**
+1.  **Clone the Repository:**
     ```bash
-    git clone <your-repo-url>
-    cd rag-app
+    git clone https://github.com/sakshi172004/rag-document-ai.git
+    cd rag-document-ai
     ```
 
-2.  **Create your `.env` file:**
-    Copy the example file and add your key.
+2.  **Set Up Environment Variables:**
+    Create a `.env` file by copying the example and add your API key.
     ```bash
     cp .env.example .env
     ```
-    Now open `.env` and paste your key.
-
-3.  **Run with Docker Compose:**
-    This command does everything: builds the app image and starts it.
-    ```bash
-    docker-compose up --build
+    Now, open the `.env` file and paste your key:
+    ```
+    GOOGLE_API_KEY="YourGoogleApiKeyHere"
     ```
 
-    Your app is now running at `http://localhost:8000`.
+3.  **Build and Run with Docker Compose:**
+    This single command builds and starts both the backend API and the frontend UI.
+    ```bash
+    docker compose up --build
+    ```
 
-## Using the API
+4.  **Access the Application:**
+    Your professional chat application is now running! Open your browser and go to:
+    **`http://localhost:8501`**
 
-The easiest way to use the API is with the auto-generated docs.
+## 📂 Project Structure
 
-*   **Go to:** `http://localhost:8000/docs`
-
-From there you can test all the endpoints:
-- `POST /upload`: To upload your PDFs.
-- `POST /query`: To ask a question.
-- `GET /documents`: To see what you've uploaded.
-
-## Running Tests
-
-To make sure everything is working, you can run the tests. Make sure the app is running first.
-
-```bash
-docker-compose exec rag-api pytest
 ```
+rag-app/
+├── app/
+│   ├── db.py             # Metadata DB logic (SQLite)
+│   ├── pipeline.py       # Core RAG logic (FAISS, LangChain, Gemini)
+│   └── ...
+├── deploy_app.py         # All-in-one app for Streamlit Cloud deployment
+├── frontend.py           # Streamlit UI for local Docker setup
+├── .env.example          # Environment variable template
+├── Dockerfile            # Instructions to build the application container
+├── docker-compose.yml    # Orchestrates the backend and frontend services
+├── requirements.txt      # Python dependencies
+└── README.md             # You are here!
+```
+
+## 🧪 Running Tests
+
+To validate the backend API, you can run the included tests.
+
+1.  Make sure the containers are running: `docker compose up -d`
+2.  Execute the tests in a separate terminal:
+    ```bash
+    docker compose exec rag-api pytest
+    ```
