@@ -5,11 +5,10 @@ langchain-community
 langchain-google-genai
 pypdf
 sentence-transformers
-# REMOVED chromadb
-# ADDED faiss-cpu
 faiss-cpu
 pydantic<2
 # sqlite3 is not needed here
 pytest
 httpx
 python-multipart
+pypdf
