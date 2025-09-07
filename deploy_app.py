@@ -5,7 +5,6 @@ from datetime import datetime
 import os
 from app import db, pipeline
 
-# --- Page Configuration ---
 st.set_page_config(
     page_title="IntelliDoc AI",
     page_icon="🧠",
@@ -13,7 +12,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- UI Styling ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');

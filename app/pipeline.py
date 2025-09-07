@@ -1,18 +1,16 @@
-# app/pipeline.py
+
 import os
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-# --- YEH HAIN NAYE IMPORTS ---
 from langchain_community.vectorstores import FAISS
-# -----------------------------
 from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.output_parser import StrOutputParser
 
-# Constants
-FAISS_DB_PATH = os.path.join("data", "faiss_db") # Changed from CHROMA_DB_PATH
+
+FAISS_DB_PATH = os.path.join("data", "faiss_db") 
 UPLOAD_PATH = os.path.join("data", "uploads")
 
 embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
@@ -38,14 +36,14 @@ def process_and_store_docs(file_paths: list[str]):
     if not all_chunks:
         return
 
-    # --- NAYA, FAISS WALA LOGIC ---
+    
     if os.path.exists(FAISS_DB_PATH):
-        # If DB exists, load it and add new documents
+        
         vectorstore = FAISS.load_local(FAISS_DB_PATH, embedding_function, allow_dangerous_deserialization=True)
         vectorstore.add_documents(documents=all_chunks)
         print("Added new chunks to existing FAISS DB.")
     else:
-        # If DB doesn't exist, create a new one
+        
         vectorstore = FAISS.from_documents(documents=all_chunks, embedding=embedding_function)
         print("Created new FAISS DB.")
 

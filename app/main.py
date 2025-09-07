@@ -1,4 +1,6 @@
 # app/main.py
+from dotenv import load_dotenv
+load_dotenv()
 import os
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from typing import List
@@ -13,9 +15,7 @@ app = FastAPI(title="My RAG App")
 
 @app.on_event("startup")
 def startup_event():
-    # Create the database and tables if they don't exist
     db.init_db()
-    # Create the folder for uploads
     os.makedirs(pipeline.UPLOAD_PATH, exist_ok=True)
 
 @app.post("/upload")

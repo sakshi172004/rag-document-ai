@@ -13,9 +13,7 @@ st.set_page_config(
 )
 
 # --- API URL ---
-API_URL = "http://rag-api:8000"
-
-# --- UI Styling (Final, Professional Version) ---
+API_URL = "http://127.0.0.1:8000" 
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -115,17 +113,21 @@ with st.sidebar:
             st.button("🗑️", key=f"delete_{chat_id}", on_click=delete_chat, args=(chat_id,), use_container_width=True)
 
     st.markdown("---")
-    with st.expander("View System Documents"):
-        all_docs = get_all_system_documents()
-        if all_docs is None: st.error("Could not connect to the backend.")
-        elif not all_docs: st.info("No documents processed yet.")
-        else:
-            for doc in all_docs:
-                try:
-                    dt_object = datetime.fromisoformat(doc['uploaded_at'].replace('Z', '+00:00'))
-                    st.info(f"**File:** `{doc['filename']}`\n\n**Uploaded:** {dt_object.strftime('%b %d, %Y - %I:%M %p')}")
-                except (ValueError, KeyError): st.info(f"**File:** `{doc.get('filename', 'N/A')}`")
-
+    st.header("System Documents")
+    all_docs = get_all_system_documents() 
+    if all_docs is None:
+        st.error("Could not connect to the backend.") # Yeh ab nahi dikhna chahiye
+    elif not all_docs:
+        st.info("No documents have been processed yet.")
+    else: 
+        for doc in all_docs:
+            try:
+                dt_object = datetime.fromisoformat(doc['uploaded_at'].replace('Z', '+00:00'))
+                formatted_date = dt_object.strftime('%b %d, %Y - %I:%M %p')
+                st.info(f"**File:** `{doc['filename']}`\n\n**Uploaded:** {formatted_date}")
+            except (ValueError, KeyError):
+                st.info(f"**File:** `{doc.get('filename', 'N/A')}`")
+        
 # --- Main Interface ---
 active_chat = st.session_state.conversations.get(st.session_state.active_chat_id)
 
@@ -145,11 +147,10 @@ else:
         active_chat["messages"].append({"role": "user", "content": prompt})
         with st.chat_message("user"): st.markdown(prompt)
 
-        # --- YEH HAI ASLI FIX ---
-        # Rename the chat WITHOUT rerunning the page. This is the key.
+      
         if active_chat["name"].startswith("Chat #") or active_chat["name"] == "New Conversation":
             active_chat["name"] = prompt[:30] + "..."
-            # st.rerun() <-- YEH HAI CULPRIT, ISKO HATA DIYA HAI
+            
 
         with st.chat_message("assistant"):
             message_placeholder = st.empty()

@@ -8,7 +8,6 @@ You can try the live, deployed version of this application here:
 
 [**➡️ IntelliDoc AI - Live App**](https://rag-document-ai-kohzfpsxs8nnlnthzmbqs4.streamlit.app)
 
-![IntelliDoc AI Screenshot](demo.png)
 
 ## ✨ Features
 
@@ -68,8 +67,7 @@ You can try the live, deployed version of this application here:
 
 ## 📂 Project Structure
 
-```
-rag-app/
+```rag-app/
 ├── app/
 │   ├── db.py             # Metadata DB logic (SQLite)
 │   ├── pipeline.py       # Core RAG logic (FAISS, LangChain, Gemini)
@@ -81,14 +79,3 @@ rag-app/
 ├── docker-compose.yml    # Orchestrates the backend and frontend services
 ├── requirements.txt      # Python dependencies
 └── README.md             # You are here!
-```
-
-## 🧪 Running Tests
-
-To validate the backend API, you can run the included tests.
-
-1.  Make sure the containers are running: `docker compose up -d`
-2.  Execute the tests in a separate terminal:
-    ```bash
-    docker compose exec rag-api pytest
-    ```
