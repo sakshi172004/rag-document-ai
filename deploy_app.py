@@ -119,15 +119,24 @@ with st.sidebar:
             st.button("🗑️", key=f"delete_{chat_id}", on_click=delete_chat, args=(chat_id,), use_container_width=True)
 
     st.markdown("---")
-    with st.expander("View System Documents"):
-        all_docs = get_all_system_documents()
-        if not all_docs: st.info("No documents processed yet.")
-        else:
-            for doc in all_docs:
-                try:
-                    dt_object = datetime.fromisoformat(doc['uploaded_at'].replace('Z', '+00:00'))
-                    st.info(f"**File:** `{doc['filename']}`\n\n**Uploaded:** {dt_object.strftime('%b %d, %Y - %I:%M %p')}")
-                except (ValueError, KeyError): st.info(f"**File:** `{doc.get('filename', 'N/A')}`")
+    st.header("System Documents") # Humne ek saaf header de diya
+
+    all_docs, error = db.get_all_documents() # Hum data fetch karenge
+
+    if error:
+        st.error("Could not connect to the database.")
+    elif not all_docs:
+        st.info("No documents have been processed yet.")
+    else:
+         # Har document ke liye, hum uski info dikhayenge
+        for doc in all_docs:
+            try:
+            # Yeh date ko aache format mein dikhane ke liye hai
+                dt_object = datetime.fromisoformat(doc['uploaded_at'].replace('Z', '+00:00'))
+                formatted_date = dt_object.strftime('%b %d, %Y - %I:%M %p')
+                st.info(f"**File:** `{doc['filename']}`\n\n**Uploaded:** {formatted_date}")
+            except (ValueError, KeyError):
+                st.info(f"**File:** `{doc.get('filename', 'N/A')}`")
 
 # --- Main Interface ---
 active_chat = st.session_state.conversations.get(st.session_state.active_chat_id)
