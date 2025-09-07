@@ -30,12 +30,22 @@ def add_document(filename: str):
     conn.close()
 
 def get_all_documents():
-    conn = sqlite3.connect(DB_PATH)
-    # This makes the output a dictionary, which is nice.
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, filename, uploaded_at FROM documents ORDER BY id DESC")
-    docs = cursor.fetchall()
-    conn.close()
-    # Convert Row objects to plain dicts for FastAPI
-    return [dict(row) for row in docs]
+    """
+    Fetches all document records from the database.
+    Returns a tuple: (list_of_documents, error_message).
+    On success, error_message is None.
+    On failure, list_of_documents is an empty list.
+    """
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, filename, uploaded_at FROM documents ORDER BY id DESC")
+        docs = cursor.fetchall()
+        conn.close()
+        # Success: Documents ki list aur koi error nahi (None)
+        return [dict(row) for row in docs], None
+    except Exception as e:
+        print(f"Database error in get_all_documents: {e}")
+        # Failure: Khaali list aur ek error message
+        return [], str(e)
