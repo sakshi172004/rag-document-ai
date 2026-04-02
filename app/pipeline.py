@@ -57,31 +57,32 @@ def get_docs():
 
 # ---------------- QUERY ----------------
 def query_rag(query: str):
-    chunks = get_docs()
+    try:
+        chunks = get_docs()
 
-    if not chunks:
-        return {
-            "answer": "No documents processed yet",
-            "source_chunks": []
-        }
+        if not chunks:
+            return {
+                "answer": "No documents processed yet",
+                "source_chunks": []
+            }
 
-    # 🔥 SMART RETRIEVAL (keyword based)
-    query_words = query.lower().split()
+        query_words = query.lower().split()
 
-    scored_chunks = []
-    for chunk in chunks:
-        score = sum(word in chunk.lower() for word in query_words)
-        scored_chunks.append((score, chunk))
+        scored_chunks = []
+        for chunk in chunks:
+            score = sum(word in chunk.lower() for word in query_words)
+            scored_chunks.append((score, chunk))
 
-    # sort by relevance
-    scored_chunks.sort(reverse=True, key=lambda x: x[0])
+        scored_chunks.sort(reverse=True, key=lambda x: x[0])
 
-    # take top relevant chunks only
-    top_chunks = [chunk for score, chunk in scored_chunks[:5]]
+        top_chunks = [chunk for score, chunk in scored_chunks[:5] if score > 0]
 
-    context = "\n\n".join(top_chunks)
+        if not top_chunks:
+            top_chunks = chunks[:3]
 
-    prompt = f"""
+        context = "\n\n".join(top_chunks)
+
+        prompt = f"""
 Answer the question using ONLY the context below.
 
 Context:
@@ -90,17 +91,18 @@ Context:
 Question:
 {query}
 
-Give a detailed answer with:
-- Proper explanation
-- Bullet points if needed
-- Steps if applicable
-
-Answer like for exams.
+Give a detailed answer with explanation and points.
 """
 
-    response = llm.invoke(prompt)
+        response = llm.invoke(prompt)
 
-    return {
-        "answer": response.content,
-        "source_chunks": top_chunks
-    }
+        return {
+            "answer": response.content,
+            "source_chunks": top_chunks
+        }
+
+    except Exception as e:
+        return {
+            "answer": f"Backend error: {str(e)}",
+            "source_chunks": []
+        }
