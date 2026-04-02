@@ -61,7 +61,7 @@ def query_rag(query: str):
         }
 
     # simple retrieval (top part only)
-    context = data[:3000]
+    context = data
 
     prompt = f"""
 Answer the question using ONLY the context.
@@ -72,7 +72,9 @@ Context:
 Question:
 {query}
 
-Give short clean answer (2-3 lines).
+Explain in detail with proper points.
+If steps exist, list them clearly.
+Do not say "not in context" unless absolutely missing.
 """
 
     response = llm.invoke(prompt)
