@@ -4,8 +4,8 @@ import requests
 # ---------------- CONFIG ----------------
 st.set_page_config(page_title="IntelliDoc AI", layout="wide")
 
-API_URL = "https://rag-backend.onrender.com/query"
-UPLOAD_URL = "https://rag-backend.onrender.com/upload"
+API_URL = "https://rag-document-ai-1.onrender.com/query"
+UPLOAD_URL = "https://rag-document-ai-1.onrender.com/upload"
 
 # ---------------- CSS ----------------
 st.markdown("""
