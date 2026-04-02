@@ -9,17 +9,6 @@ You can try the live, deployed version of this application here:
 [**➡️ IntelliDoc AI - Live App**](https://sakshi172004-rag-document-ai-frontend-kdoqlv.streamlit.app/)
 
 
-# 🧠 IntelliDoc AI: Document Chat Assistant
-
-IntelliDoc AI is a full-stack AI application that allows users to upload PDF documents and ask questions from them through a chat interface.
-
----
-
-## 🚀 Live Demo
-👉 https://your-app.streamlit.app  
-
----
-
 ## ✨ Features
 - 💬 Chat with PDF documents  
 - 📄 Upload multiple files  
@@ -27,7 +16,6 @@ IntelliDoc AI is a full-stack AI application that allows users to upload PDF doc
 - 🧠 Context-based answers  
 - ☁️ Cloud-friendly and lightweight  
 
----
 
 ## 🛠️ Tech Stack
 - **Frontend:** Streamlit  
@@ -36,7 +24,6 @@ IntelliDoc AI is a full-stack AI application that allows users to upload PDF doc
 - **Core Logic:** LangChain  
 - **Storage:** File-based (data.txt)  
 
----
 
 ## 🧠 How It Works
 1. Upload PDF  
@@ -45,7 +32,6 @@ IntelliDoc AI is a full-stack AI application that allows users to upload PDF doc
 4. Retrieve relevant content  
 5. Generate answer using AI  
 
----
 
 ## 📂 Project Structure
 
