@@ -100,21 +100,23 @@ def query_rag(query: str):
 
         # 🔥 CONTROLLED PROMPT
         prompt = f"""
-Answer using the context below.
+        Answer STRICTLY using the given context.
 
-- Keep answer similar to notes
-- Give clear explanation
-- Do NOT give generic textbook answer
-- Do NOT say "not in context"
+        Rules:
+        - Use ONLY the words and information from context
+        - Do NOT add extra knowledge
+        - Keep answer similar to notes (exam style)
+        - If definition is present, give it clearly
+        - Keep it concise and to the point
 
-Context:
-{context}
+        Context:
+        {context}
 
-Question:
-{query}
+        Question:
+        {query}
 
-Answer:
-"""
+        Answer:
+        """
 
         response = llm.invoke(prompt)
 
