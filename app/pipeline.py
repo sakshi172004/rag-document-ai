@@ -4,7 +4,6 @@ load_dotenv()
 import os
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import FAISS
 from langchain_groq import ChatGroq
 
 # ---------------- PATH ----------------
@@ -31,40 +30,59 @@ def process_and_store_docs(file_paths):
 
     chunks = splitter.split_documents(documents)
 
-    # ❌ NO embeddings → simple storage (temporary fix)
+    # store chunks properly
     texts = [doc.page_content for doc in chunks]
 
     os.makedirs(DB_PATH, exist_ok=True)
 
     with open(os.path.join(DB_PATH, "data.txt"), "w", encoding="utf-8") as f:
-        for t in texts:
-            f.write(t + "\n\n")
+        f.write("\n\n".join(texts))
+
+    print("TOTAL CHUNKS:", len(texts))
+
 
 # ---------------- LOAD ----------------
 def get_docs():
     file_path = os.path.join(DB_PATH, "data.txt")
 
     if not os.path.exists(file_path):
-        return None
+        return []
 
     with open(file_path, "r", encoding="utf-8") as f:
-        return f.read()
+        data = f.read()
+
+    # split back into chunks
+    return data.split("\n\n")
+
 
 # ---------------- QUERY ----------------
 def query_rag(query: str):
-    data = get_docs()
+    chunks = get_docs()
 
-    if data is None:
+    if not chunks:
         return {
             "answer": "No documents processed yet",
             "source_chunks": []
         }
 
-    # simple retrieval (top part only)
-    context = data
+    # 🔥 SMART RETRIEVAL (keyword based)
+    query_words = query.lower().split()
+
+    scored_chunks = []
+    for chunk in chunks:
+        score = sum(word in chunk.lower() for word in query_words)
+        scored_chunks.append((score, chunk))
+
+    # sort by relevance
+    scored_chunks.sort(reverse=True, key=lambda x: x[0])
+
+    # take top relevant chunks only
+    top_chunks = [chunk for score, chunk in scored_chunks[:5]]
+
+    context = "\n\n".join(top_chunks)
 
     prompt = f"""
-Answer the question using ONLY the context.
+Answer the question using ONLY the context below.
 
 Context:
 {context}
@@ -72,14 +90,17 @@ Context:
 Question:
 {query}
 
-Explain in detail with proper points.
-If steps exist, list them clearly.
-Do not say "not in context" unless absolutely missing.
+Give a detailed answer with:
+- Proper explanation
+- Bullet points if needed
+- Steps if applicable
+
+Answer like for exams.
 """
 
     response = llm.invoke(prompt)
 
     return {
         "answer": response.content,
-        "source_chunks": [context[:500]]
+        "source_chunks": top_chunks
     }
