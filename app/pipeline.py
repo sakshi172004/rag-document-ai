@@ -64,30 +64,44 @@ def query_rag(query: str):
                 "source_chunks": []
             }
 
-        # 🔍 keyword-based scoring
+        # 🔥 better keyword matching
         query_words = query.lower().split()
 
         scored_chunks = []
         for chunk in chunks:
-            score = sum(word in chunk.lower() for word in query_words)
+            chunk_lower = chunk.lower()
+
+            score = 0
+            for word in query_words:
+                if word in chunk_lower:
+                    score += 2   # strong match
+
+            # bonus for phrase match
+            if query.lower() in chunk_lower:
+                score += 5
+
             scored_chunks.append((score, chunk))
 
-        # sort by score
+        # sort best first
         scored_chunks.sort(reverse=True, key=lambda x: x[0])
 
-        # take relevant chunks only
-        top_chunks = [chunk for score, chunk in scored_chunks[:5] if score > 0]
+        # top chunks (even if low score)
+        top_chunks = [chunk for score, chunk in scored_chunks[:5]]
 
-        # fallback (VERY IMPORTANT)
-        if not top_chunks:
-            top_chunks = chunks[:3]
-
-        # 🔥 LIMIT CONTEXT (prevents crash)
+        # 🔥 LIMIT context (IMPORTANT)
         context = "\n\n".join(top_chunks)
-        context = context[:4000]
+        context = context[:3500]
 
+        # 🔥 BALANCED PROMPT (BEST)
         prompt = f"""
-Answer the question using ONLY the context below.
+You are a helpful AI assistant.
+
+Use the context below to answer the question.
+
+- Focus mainly on the context.
+- If some part is missing, you can slightly complete it.
+- Keep answer clear, structured, and exam-friendly.
+- Do NOT say "not in context".
 
 Context:
 {context}
@@ -95,7 +109,7 @@ Context:
 Question:
 {query}
 
-Give a detailed answer with clear explanation and bullet points if needed.
+Answer:
 """
 
         response = llm.invoke(prompt)
