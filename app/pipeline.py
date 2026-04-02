@@ -9,7 +9,7 @@ from langchain_groq import ChatGroq
 # ---------------- PATH ----------------
 DB_PATH = "vectorstore"
 
-# ---------------- LLM (Groq) ----------------
+# ---------------- LLM ----------------
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
     temperature=0
@@ -30,7 +30,6 @@ def process_and_store_docs(file_paths):
 
     chunks = splitter.split_documents(documents)
 
-    # store chunks properly
     texts = [doc.page_content for doc in chunks]
 
     os.makedirs(DB_PATH, exist_ok=True)
@@ -51,7 +50,6 @@ def get_docs():
     with open(file_path, "r", encoding="utf-8") as f:
         data = f.read()
 
-    # split back into chunks
     return data.split("\n\n")
 
 
@@ -62,10 +60,11 @@ def query_rag(query: str):
 
         if not chunks:
             return {
-                "answer": "No documents processed yet",
+                "answer": "No documents processed yet.",
                 "source_chunks": []
             }
 
+        # 🔍 keyword-based scoring
         query_words = query.lower().split()
 
         scored_chunks = []
@@ -73,14 +72,19 @@ def query_rag(query: str):
             score = sum(word in chunk.lower() for word in query_words)
             scored_chunks.append((score, chunk))
 
+        # sort by score
         scored_chunks.sort(reverse=True, key=lambda x: x[0])
 
+        # take relevant chunks only
         top_chunks = [chunk for score, chunk in scored_chunks[:5] if score > 0]
 
+        # fallback (VERY IMPORTANT)
         if not top_chunks:
             top_chunks = chunks[:3]
 
+        # 🔥 LIMIT CONTEXT (prevents crash)
         context = "\n\n".join(top_chunks)
+        context = context[:4000]
 
         prompt = f"""
 Answer the question using ONLY the context below.
@@ -91,7 +95,7 @@ Context:
 Question:
 {query}
 
-Give a detailed answer with explanation and points.
+Give a detailed answer with clear explanation and bullet points if needed.
 """
 
         response = llm.invoke(prompt)
