@@ -10,67 +10,57 @@ You can try the live, deployed version of this application here:
 
 
 ✨ Features
-Interactive Chat UI (Streamlit-based clean interface)
-Multi-PDF Upload Support
-Custom RAG Pipeline (no heavy dependencies)
-Smart Chunking with structure preservation
-Keyword-based Retrieval with scoring
-Neighbor Chunk Retrieval (avoids missing info)
-Context-aware Answer Generation
-Session-based Chat History
-Lightweight & Cloud-friendly (works on free tier)
+💬 Interactive chat-based UI
+📄 Upload and query multiple PDF documents
+⚡ Lightweight RAG pipeline (no heavy dependencies)
+🤖 Powered by Groq (LLaMA 3.1) for fast responses
+🧠 Context-based answer generation (reduced hallucination)
+💾 Session-based chat history
+☁️ Fully cloud deployable (Streamlit + Render)
+
+
 🛠️ Tech Stack
 Frontend: Streamlit
 Backend: FastAPI
-LLM: Groq (llama-3.1-8b-instant)
+LLM: Groq (LLaMA 3.1 8B Instant)
 Core Logic: LangChain
 Document Loader: PyPDFLoader
 Text Splitting: RecursiveCharacterTextSplitter
-Retrieval: Custom keyword-based retrieval
 Storage: File-based (data.txt)
-Deployment: Render (backend) + Streamlit Cloud (frontend)
-🔄 How It Works (Workflow)
+Deployment: Streamlit Cloud + Render
+
+
+🧠 How It Works (Workflow)
 User uploads PDF
 Backend extracts text using PyPDFLoader
 Text is split into chunks (smart chunking)
 Chunks are stored in a file (data.txt)
 User asks a question
-System retrieves relevant chunks using keyword scoring
-Neighbor chunks are also selected to avoid missing context
-Context is sent to Groq LLM
+System retrieves relevant chunks (keyword-based)
+Context + query sent to Groq LLM
 LLM generates final answer
 Answer displayed in chat UI
-⚙️ Running Locally
-Prerequisites
-Python 3.9+
-Git
-Groq API Key
-Setup Steps
-Clone the repo:
-git clone https://github.com/sakshi172004/rag-document-ai.git
-cd rag-document-ai
-Create .env file:
-GROQ_API_KEY="your_groq_api_key"
-Install dependencies:
-pip install -r requirements.txt
-Run backend:
-uvicorn app.main:app --reload
-Run frontend:
-streamlit run frontend.py
-Open:
-http://localhost:8501
 
 
-## 📂 Project Structure
-
-```rag-app/
+📂 Project Structure 
+rag-document-ai/
+│
 ├── app/
-│   ├── pipeline.py       # Core RAG logic (chunking + retrieval + Groq)
-│   └── ...
-├── deploy_app.py         # All-in-one app for Streamlit Cloud deployment
-├── frontend.py           # Streamlit UI for local Docker setup
-├── .env.example          # Environment variable template
-├── Dockerfile            # Instructions to build the application container
-├── docker-compose.yml    # Orchestrates the backend and frontend services
-├── requirements.txt      
-└── README.md             # You are here!
+│   ├── main.py          # FastAPI backend (routes: /upload, /query)
+│   ├── pipeline.py      # Core logic (PDF → chunking → retrieval → LLM)
+│   ├── db.py            # Metadata handling
+│   ├── models.py        # Request/response schemas
+│   └── __init__.py
+│
+├── frontend.py          # Streamlit UI (chat + upload)
+├── deploy_app.py        # Streamlit-only version (for cloud deployment)
+│
+├── data/                # Stored processed text (data.txt)
+│
+├── requirements.txt     # Dependencies
+├── Dockerfile           # Container setup
+├── docker-compose.yml   # Multi-service orchestration (frontend + backend)
+│
+├── .env.example         # Environment variables template
+├── .gitignore
+└── README.md
