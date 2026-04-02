@@ -5,18 +5,12 @@ import os
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
 
 # ---------------- PATH ----------------
 DB_PATH = "vectorstore"
 
-# ---------------- EMBEDDINGS ----------------
-embedding_model = HuggingFaceEmbeddings(
-    model_name="all-MiniLM-L6-v2"
-)
-
-# ---------------- LLM (WORKING 🔥) ----------------
+# ---------------- LLM (Groq) ----------------
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
     temperature=0
@@ -37,36 +31,37 @@ def process_and_store_docs(file_paths):
 
     chunks = splitter.split_documents(documents)
 
-    db = FAISS.from_documents(chunks, embedding_model)
+    # ❌ NO embeddings → simple storage (temporary fix)
+    texts = [doc.page_content for doc in chunks]
 
     os.makedirs(DB_PATH, exist_ok=True)
-    db.save_local(DB_PATH)
+
+    with open(os.path.join(DB_PATH, "data.txt"), "w", encoding="utf-8") as f:
+        for t in texts:
+            f.write(t + "\n\n")
 
 # ---------------- LOAD ----------------
-def get_vectorstore():
-    if not os.path.exists(DB_PATH):
+def get_docs():
+    file_path = os.path.join(DB_PATH, "data.txt")
+
+    if not os.path.exists(file_path):
         return None
 
-    return FAISS.load_local(
-        DB_PATH,
-        embedding_model,
-        allow_dangerous_deserialization=True
-    )
+    with open(file_path, "r", encoding="utf-8") as f:
+        return f.read()
 
 # ---------------- QUERY ----------------
 def query_rag(query: str):
-    vs = get_vectorstore()
+    data = get_docs()
 
-    if vs is None:
+    if data is None:
         return {
             "answer": "No documents processed yet",
             "source_chunks": []
         }
 
-    retriever = vs.as_retriever(search_kwargs={"k": 3})
-    docs = retriever.invoke(query)
-
-    context = "\n\n".join([doc.page_content for doc in docs])
+    # simple retrieval (top part only)
+    context = data[:3000]
 
     prompt = f"""
 Answer the question using ONLY the context.
@@ -84,5 +79,5 @@ Give short clean answer (2-3 lines).
 
     return {
         "answer": response.content,
-        "source_chunks": [doc.page_content for doc in docs]
+        "source_chunks": [context[:500]]
     }
