@@ -24,7 +24,7 @@ def process_and_store_docs(file_paths):
         documents.extend(loader.load())
 
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
+        chunk_size=700,
         chunk_overlap=100
     )
 
@@ -64,44 +64,48 @@ def query_rag(query: str):
                 "source_chunks": []
             }
 
-        # 🔥 better keyword matching
-        query_words = query.lower().split()
+        # 🔥 REMOVE USELESS WORDS
+        stopwords = {"what", "is", "the", "of", "in", "a", "an"}
+        query_words = [w for w in query.lower().split() if w not in stopwords]
 
         scored_chunks = []
+
         for chunk in chunks:
             chunk_lower = chunk.lower()
 
             score = 0
+
             for word in query_words:
                 if word in chunk_lower:
-                    score += 2   # strong match
+                    score += 5   # 🔥 strong boost
 
-            # bonus for phrase match
+            # 🔥 exact phrase boost
             if query.lower() in chunk_lower:
-                score += 5
+                score += 10
 
             scored_chunks.append((score, chunk))
 
-        # sort best first
+        # sort
         scored_chunks.sort(reverse=True, key=lambda x: x[0])
 
-        # top chunks (even if low score)
-        top_chunks = [chunk for score, chunk in scored_chunks[:5]]
+        # 🔥 TAKE BEST
+        top_chunks = [chunk for score, chunk in scored_chunks[:4]]
 
-        # 🔥 LIMIT context (IMPORTANT)
+        # 🔥 fallback (IMPORTANT)
+        if all(score == 0 for score, _ in scored_chunks[:4]):
+            top_chunks = chunks[:4]
+
         context = "\n\n".join(top_chunks)
-        context = context[:3500]
+        context = context[:3000]
 
-        # 🔥 BALANCED PROMPT (BEST)
+        # 🔥 CONTROLLED PROMPT
         prompt = f"""
-You are a helpful AI assistant.
+Answer using the context below.
 
-Use the context below to answer the question.
-
-- Focus mainly on the context.
-- If some part is missing, you can slightly complete it.
-- Keep answer clear, structured, and exam-friendly.
-- Do NOT say "not in context".
+- Keep answer similar to notes
+- Give clear explanation
+- Do NOT give generic textbook answer
+- Do NOT say "not in context"
 
 Context:
 {context}
