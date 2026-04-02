@@ -64,65 +64,68 @@ def query_rag(query: str):
                 "source_chunks": []
             }
 
-        # 🔥 REMOVE USELESS WORDS
         stopwords = {"what", "is", "the", "of", "in", "a", "an"}
         query_words = [w for w in query.lower().split() if w not in stopwords]
 
         scored_chunks = []
 
-        for chunk in chunks:
+        for i, chunk in enumerate(chunks):
             chunk_lower = chunk.lower()
-
             score = 0
 
             for word in query_words:
                 if word in chunk_lower:
-                    score += 5   # 🔥 strong boost
+                    score += 5
 
-            # 🔥 exact phrase boost
             if query.lower() in chunk_lower:
                 score += 10
 
-            scored_chunks.append((score, chunk))
+            scored_chunks.append((score, i, chunk))
 
         # sort
         scored_chunks.sort(reverse=True, key=lambda x: x[0])
 
-        # 🔥 TAKE BEST
-        top_chunks = [chunk for score, chunk in scored_chunks[:4]]
+        # 🔥 pick best + neighbors
+        selected_chunks = []
 
-        # 🔥 fallback (IMPORTANT)
-        if all(score == 0 for score, _ in scored_chunks[:4]):
-            top_chunks = chunks[:4]
+        for score, idx, chunk in scored_chunks[:2]:   # top 2 main chunks
+            selected_chunks.append(chunk)
 
-        context = "\n\n".join(top_chunks)
-        context = context[:3000]
+            # 🔥 ADD NEIGHBOURS (MAIN FIX)
+            if idx + 1 < len(chunks):
+                selected_chunks.append(chunks[idx + 1])
 
-        # 🔥 CONTROLLED PROMPT
+            if idx - 1 >= 0:
+                selected_chunks.append(chunks[idx - 1])
+
+        # remove duplicates
+        selected_chunks = list(dict.fromkeys(selected_chunks))
+
+        context = "\n\n".join(selected_chunks)
+        context = context[:4000]
+
         prompt = f"""
-        Answer STRICTLY using the given context.
+Answer STRICTLY using the context.
 
-        Rules:
-        - Use ONLY the words and information from context
-        - Do NOT add extra knowledge
-        - Keep answer similar to notes (exam style)
-        - If definition is present, give it clearly
-        - Keep it concise and to the point
+- Include ALL steps if present
+- Do NOT skip any section
+- Keep answer complete and structured
+- Do NOT write "(No details provided)"
 
-        Context:
-        {context}
+Context:
+{context}
 
-        Question:
-        {query}
+Question:
+{query}
 
-        Answer:
-        """
+Answer:
+"""
 
         response = llm.invoke(prompt)
 
         return {
             "answer": response.content,
-            "source_chunks": top_chunks
+            "source_chunks": selected_chunks
         }
 
     except Exception as e:
