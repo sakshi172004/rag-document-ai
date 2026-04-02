@@ -12,3 +12,4 @@ pytest
 httpx
 python-multipart
 pypdf
+protobuf==3.20.3
