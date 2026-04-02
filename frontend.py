@@ -102,17 +102,24 @@ query = st.chat_input("Ask something...")
 if query and st.session_state.current_chat is not None:
     try:
         res = requests.post(API_URL, json={"query": query})
-        data = res.json()
 
-        # safe extraction
-        answer = data.get("answer") or data.get("response") or str(data)
+        # 🔥 check status first
+        if res.status_code != 200:
+            st.error(f"Backend error: {res.text}")
+        else:
+            try:
+                data = res.json()
+                answer = data.get("answer") or data.get("response") or "No answer returned"
+            except:
+                st.error(f"Invalid response from backend: {res.text}")
+                answer = "Error parsing response"
 
-        chat = st.session_state.chats[st.session_state.current_chat]
+            chat = st.session_state.chats[st.session_state.current_chat]
 
-        chat["messages"].append({"role": "user", "content": query})
-        chat["messages"].append({"role": "bot", "content": answer})
+            chat["messages"].append({"role": "user", "content": query})
+            chat["messages"].append({"role": "bot", "content": answer})
 
-        st.rerun()
+            st.rerun()
 
     except Exception as e:
         st.error(f"Error: {str(e)}")
