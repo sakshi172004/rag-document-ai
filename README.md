@@ -6,7 +6,7 @@ IntelliDoc AI is a full-stack, containerized Retrieval-Augmented Generation (RAG
 
 You can try the live, deployed version of this application here:
 
-[**➡️ IntelliDoc AI - Live App**](https://rag-document-ai-kohzfpsxs8nnlnthzmbqs4.streamlit.app)
+[**➡️ IntelliDoc AI - Live App**](https://sakshi172004-rag-document-ai-frontend-kdoqlv.streamlit.app/)
 
 
 ## ✨ Features
