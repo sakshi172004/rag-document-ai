@@ -43,9 +43,12 @@ def get_all_documents():
         cursor.execute("SELECT id, filename, uploaded_at FROM documents ORDER BY id DESC")
         docs = cursor.fetchall()
         conn.close()
-        # Success: Documents ki list aur koi error nahi (None)
         return [dict(row) for row in docs], None
     except Exception as e:
         print(f"Database error in get_all_documents: {e}")
-        # Failure: Khaali list aur ek error message
         return [], str(e)
+
+
+ 
+    
+
