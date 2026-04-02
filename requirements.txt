@@ -3,7 +3,7 @@ uvicorn
 python-multipart
 langchain==0.1.16
 langchain-community==0.0.32
-langchain-google-genai
+langchain-groq
 pypdf
 faiss-cpu
 pydantic<2
