@@ -23,7 +23,7 @@ def process_and_store_docs(file_paths):
         loader = PyPDFLoader(path)
         documents.extend(loader.load())
 
-    # 🔥 SMART CHUNKING (MAIN FIX)
+    # 🔥 SMART CHUNKING (FIX)
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=1500,
         chunk_overlap=300,
@@ -42,8 +42,7 @@ def process_and_store_docs(file_paths):
     os.makedirs(DB_PATH, exist_ok=True)
 
     with open(os.path.join(DB_PATH, "data.txt"), "w", encoding="utf-8") as f:
-        # 🔥 custom separator
-        f.write("\n\n---\n\n".join(texts))
+        f.write("\n\n---\n\n".join(texts))  # custom separator
 
     print("TOTAL CHUNKS:", len(texts))
 
@@ -58,7 +57,6 @@ def get_docs():
     with open(file_path, "r", encoding="utf-8") as f:
         data = f.read()
 
-    # 🔥 split correctly
     return data.split("\n\n---\n\n")
 
 
@@ -73,7 +71,7 @@ def query_rag(query: str):
                 "source_chunks": []
             }
 
-        # 🔥 clean query
+        # 🔥 remove useless words
         stopwords = {"what", "is", "the", "of", "in", "a", "an"}
         query_words = [w for w in query.lower().split() if w not in stopwords]
 
@@ -95,10 +93,10 @@ def query_rag(query: str):
         # sort best first
         scored_chunks.sort(reverse=True, key=lambda x: x[0])
 
-        # 🔥 TAKE BEST + NEIGHBOURS (MAIN FIX)
+        # 🔥 TAKE BEST + NEIGHBOURS (FIX)
         selected_chunks = []
 
-        for score, idx, chunk in scored_chunks[:2]:
+        for score, idx, chunk in scored_chunks[:4]:   # increased from 2 → 4
             selected_chunks.append(chunk)
 
             if idx + 1 < len(chunks):
@@ -110,11 +108,11 @@ def query_rag(query: str):
         # remove duplicates
         selected_chunks = list(dict.fromkeys(selected_chunks))
 
-        # limit context
+        # 🔥 increase context size (FIX)
         context = "\n\n".join(selected_chunks)
-        context = context[:4000]
+        context = context[:7000]
 
-        # 🔥 FINAL PROMPT (STRICT)
+        # 🔥 FINAL PROMPT
         prompt = f"""
 Answer STRICTLY using the context.
 
