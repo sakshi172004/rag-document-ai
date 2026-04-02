@@ -9,58 +9,67 @@ You can try the live, deployed version of this application here:
 [**➡️ IntelliDoc AI - Live App**](https://sakshi172004-rag-document-ai-frontend-kdoqlv.streamlit.app/)
 
 
-✨ Features
-💬 Interactive chat-based UI
-📄 Upload and query multiple PDF documents
-⚡ Lightweight RAG pipeline (no heavy dependencies)
-🤖 Powered by Groq (LLaMA 3.1) for fast responses
-🧠 Context-based answer generation (reduced hallucination)
-💾 Session-based chat history
-☁️ Fully cloud deployable (Streamlit + Render)
+# 🧠 IntelliDoc AI: Document Chat Assistant
 
+IntelliDoc AI is a full-stack AI application that allows users to upload PDF documents and ask questions from them through a chat interface.
 
-🛠️ Tech Stack
-Frontend: Streamlit
-Backend: FastAPI
-LLM: Groq (LLaMA 3.1 8B Instant)
-Core Logic: LangChain
-Document Loader: PyPDFLoader
-Text Splitting: RecursiveCharacterTextSplitter
-Storage: File-based (data.txt)
-Deployment: Streamlit Cloud + Render
+---
 
+## 🚀 Live Demo
+👉 https://your-app.streamlit.app  
 
-🧠 How It Works (Workflow)
-User uploads PDF
-Backend extracts text using PyPDFLoader
-Text is split into chunks (smart chunking)
-Chunks are stored in a file (data.txt)
-User asks a question
-System retrieves relevant chunks (keyword-based)
-Context + query sent to Groq LLM
-LLM generates final answer
-Answer displayed in chat UI
+---
 
+## ✨ Features
+- 💬 Chat with PDF documents  
+- 📄 Upload multiple files  
+- ⚡ Fast AI responses using Groq  
+- 🧠 Context-based answers  
+- ☁️ Cloud-friendly and lightweight  
 
-📂 Project Structure 
+---
+
+## 🛠️ Tech Stack
+- **Frontend:** Streamlit  
+- **Backend:** FastAPI  
+- **LLM:** Groq (LLaMA 3.1)  
+- **Core Logic:** LangChain  
+- **Storage:** File-based (data.txt)  
+
+---
+
+## 🧠 How It Works
+1. Upload PDF  
+2. Extract and split text into chunks  
+3. Store chunks in a file  
+4. Retrieve relevant content  
+5. Generate answer using AI  
+
+---
+
+## 📂 Project Structure
+
+```
 rag-document-ai/
 │
 ├── app/
-│   ├── main.py          # FastAPI backend (routes: /upload, /query)
-│   ├── pipeline.py      # Core logic (PDF → chunking → retrieval → LLM)
-│   ├── db.py            # Metadata handling
-│   ├── models.py        # Request/response schemas
+│   ├── main.py
+│   ├── pipeline.py
+│   ├── db.py
+│   ├── models.py
 │   └── __init__.py
 │
-├── frontend.py          # Streamlit UI (chat + upload)
-├── deploy_app.py        # Streamlit-only version (for cloud deployment)
+├── frontend.py
+├── deploy_app.py
+├── data/
+│   └── data.txt
 │
-├── data/                # Stored processed text (data.txt)
-│
-├── requirements.txt     # Dependencies
-├── Dockerfile           # Container setup
-├── docker-compose.yml   # Multi-service orchestration (frontend + backend)
-│
-├── .env.example         # Environment variables template
-├── .gitignore
+├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
+├── .env.example
 └── README.md
+```
+
+---
+
